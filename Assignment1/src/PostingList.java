@@ -20,6 +20,9 @@ public class PostingList
 	{
 		return docs.toString();
 	}
-	
+	public Set<Integer> getDocs()
+	{
+		return docs.keySet();
+	}
 	
 }

@@ -15,6 +15,7 @@ public class Solution
 			String[] tokens = Utils.tokenize(content);
 			for(String t: tokens)
 			{
+				System.out.println(t);
 				if(!index.containsKey(t))
 					index.put(t, new PostingList());
 				index.get(t).addDocument(docCount, tokenCount);
@@ -22,11 +23,11 @@ public class Solution
 			}
 			docCount++;
 		}
-		//System.out.println(index);
+		System.out.println(index);
 	}
 	public static void main(String[] args)
 	{
 		buildIndex();
-		System.out.println(index.get("old"));
+		//System.out.println(index.get("old"));
 	}
 }
