@@ -91,6 +91,11 @@ class PositionalInvertedIndex
 
     public String wordWithinNextKWords(String lhs, int k, String rhs)
     {
+        return getStringResult(wordWithinNextKWordsHelper(lhs, k, rhs));
+    }
+
+    public List<Integer> wordWithinNextKWordsHelper(String lhs, int k, String rhs)
+    {
         try
         {
             lhs = Utils.tokenizeWord(lhs);
@@ -156,13 +161,13 @@ class PositionalInvertedIndex
                     ++qIndex;
             }   
     
-            return getStringResult(new ArrayList<>(result));
+            return new ArrayList<>(result);
         }
 
         catch(Exception e)
         {
             e.printStackTrace();
-            return "[ERROR] : ";
+            return null;
         }
         
     }
