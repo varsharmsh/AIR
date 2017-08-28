@@ -111,7 +111,6 @@ class PositionalInvertedIndex
                     List<Integer> pPos = index.get(lhs).getPositions(pDocId);
                     List<Integer> qPos = index.get(rhs).getPositions(qDocId);
                     List<Integer> intermediate = new ArrayList<Integer>();
-                    
 
                     int pPosIndex = 0;
                     int qPosIndex = 0;
@@ -139,7 +138,7 @@ class PositionalInvertedIndex
                             }
 
                             if(intermediate.size() > 0)
-                                result.add(pIndex);
+                                result.add(pDocId);
     
                             ++qPosIndex;
                         }
