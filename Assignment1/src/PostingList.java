@@ -17,7 +17,11 @@ public class PostingList
 		}
 		docs.get(docId).add(position);
 	}
-
+	public boolean search(int docID, int pos)
+	{
+		List<Integer> toSearch = docs.get(docID);
+		return toSearch.contains(pos);
+	}
 	@Override
 	public String toString() 
 	{

@@ -12,13 +12,19 @@ class PositionalInvertedIndex
         index = new HashMap<String, PostingList>();
         buildIndex();
     }
-
+    public String phraseIntersection(String lhs, String rhs)
+    {
+    	List<Integer> phrase1 = searchPhraseHelper(lhs);
+    	List<Integer> phrase2 = searchPhraseHelper(rhs);
+    	return getStringResult(performIntersection(phrase1,phrase2));
+    }
     private void buildIndex()
     {
         int docCount = 0;
 		for(File file: fileNames)
 		{
 			int tokenCount = 0;
+			//System.out.println(file);
 			String content = Utils.readFile(file);
 			// System.out.println(file.getName());
 			String[] tokens = Utils.tokenize(content);
@@ -35,16 +41,21 @@ class PositionalInvertedIndex
 
     public String getContainingDocs(String token)
     {
-        try
-        {
-            Set<Integer> result = index.get(Utils.tokenizeWord(token)).getDocs();
-            return Arrays.toString(result.toArray());
-        }
-
-        catch(Exception e)
+    	try
+    	{
+    		return getStringResult(getContainingDocsHelper(token));
+    	}
+    	catch(Exception e)
         {
             return "[ERROR] : " + e;
         }
+    	
+    }
+    public List<Integer> getContainingDocsHelper(String token)
+    {
+  
+            Set<Integer> result = index.get(Utils.tokenizeWord(token)).getDocs();
+            return new ArrayList(result);                   
     }
 
     public String unionOfDocs(String lhs, String rhs)
@@ -80,15 +91,70 @@ class PositionalInvertedIndex
     }
 
     public String searchPhrase(String phrase)
-    {
-        return null;
+    {    
+    	try
+    	{
+    		return getStringResult(searchPhraseHelper(phrase));
+    	}
+    	catch(Exception e)
+    	{
+    		 return "[ERROR] : " + e;
+    	}
     }
-
-    public String seachPhrase(String lhs, String rhs)
+    private boolean checkPhrase(String[] words, int docId)
     {
-        return null;
+    	try
+    	{
+    		//System.out.println("In document " + docId);
+    		List<Integer> startPos = index.get(words[0]).docs.get(docId);
+    		//System.out.println(startPos);
+    		for(int pos:startPos)
+    		{
+    			int temp = pos;
+    			int i;
+    			for(i = 1; i< words.length; i++)
+    			{
+    				if(!index.get(words[i]).search(docId,temp+1))
+    				{
+    					//System.out.println("false for " + words[i] + temp);
+    					break;
+    				}
+    				temp++;
+    			}
+    			if(i== words.length)
+    				return true;
+    		}
+    		return false;
+    		    				
+    	}
+    	catch(Exception e)
+    	{
+    		return false;
+    	}
+    	
+    	
     }
-
+    public List<Integer> searchPhraseHelper(String phrase)
+    {
+    	String[] words = Utils.tokenize(phrase);
+    	List<Integer> allDocs = null;
+    	List<Integer> phraseDocs = new ArrayList<Integer>();
+    	for(int i = 0 ; i< words.length;i++)
+    	{
+    		if(allDocs==null)
+    			allDocs = getContainingDocsHelper(words[i]);
+    		else
+    			allDocs = performIntersection(allDocs,getContainingDocsHelper(words[i]));
+    	} 
+    	//System.out.println(allDocs);
+    	for(int i:allDocs)
+    	{
+    		if(checkPhrase(words,i))
+    			phraseDocs.add(i);
+    			
+    	}
+    	return phraseDocs;
+    }
     public String wordWithinNextKWords(String lhs, int k, String rhs)
     {
         return getStringResult(wordWithinNextKWordsHelper(lhs, k, rhs));
