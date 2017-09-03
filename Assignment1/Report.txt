@@ -1,0 +1,21 @@
+Assignment 1
+
+Building Inverted Index:
+    Data structures used: Map, List (String, Integer)
+    Complexity: O(N * M), where N is the number of words to be added and M is the complexity involved in computing the hash for the word. 
+
+Finding Union (cat OR dog):
+    Data structures used: Set, List
+    Complexity: O(M + N), M is length of first list and N is length of second list.
+
+Finding Intersection (cat AND dog):
+    Data structures used: List
+    Complexity: O(M + N), M is length of first list and N is length of second list.
+
+Finding Within next K positions (cat \2 dog):
+    Data structures used: List
+    Complexity: O(MN), M is the length of document list, N is the length of positions list.
+
+Phrase search:
+    Get index of first word, find all documents with word \1 nextWord, word \2 nextWord+1...
+    Complexity: O(MN)
