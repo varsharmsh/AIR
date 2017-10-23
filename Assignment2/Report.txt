@@ -1,0 +1,12 @@
+Assignment 2:
+    Data structures used: Map, LinkedList
+    
+    Approach taken:
+        We tried to make every line as a document.
+
+    Main challenge here was to manage memory, so we used java reference type of Integer, and inserted the same object in document Id list for all the tokens occuring in that doc.
+
+    Next challenge was to map docIds to the URLs, we did not store anythimg for this, we used the docId and then went to that line in the file and returned it to save memory. This was a space time tradeoff.
+
+    PS:
+        We tried another approach before we submitted where we treated all lines with same URL as one document, this took much less memory as we could represent docIds as a short.

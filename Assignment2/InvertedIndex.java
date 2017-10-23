@@ -1,44 +1,162 @@
+import java.awt.List;
 import java.io.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.nio.file.*;
 import java.nio.charset.Charset;
+
 public class InvertedIndex
 {
-    HashMap<String, ArrayList<Short>> index;
+    private HashMap<String, LinkedList<Integer>> index;
+    private String fileName;
+
     public InvertedIndex(String csv)
     {
-        index =  new HashMap<String,ArrayList<Short>>();
+        fileName = csv;
+        index =  new HashMap<String, LinkedList<Integer>>();
         buildIndex(csv);
     }
+
     public  void buildIndex(String csvName)
     {
         File inp = new File(csvName);
-        File docIds = new File("docId.txt");
-        HashMap<String,StringBuilder> docs = Utils.readCSV(inp);
-        Iterator docIterator = docs.entrySet().iterator();
-        short docCount = 0;
-        while(docIterator.hasNext())
-        {
-            Map.Entry entry = (Map.Entry)docIterator.next();
-            String url = (String)entry.getKey();
-            Utils.appendFile(docIds, docCount + ":" + url);
-            String content = entry.getValue().toString();
-            String tokens[]  = Utils.tokenize(content);
-            for(int i = 0; i < tokens.length;i++)
-            {
-                if(!index.containsKey(tokens[i]))
-                    index.put(tokens[i], new ArrayList<Short>());
-                ArrayList<Short> temp = index.get(tokens[i]);
-                if(temp.size() == 0 || temp.get(temp.size()-1)!=docCount)
-                    temp.add(docCount);
+        int i = 0;
+
+        try
+		{
+			BufferedReader br = new BufferedReader(new FileReader(inp));
+			String line = "";
+			
+			while ((line = br.readLine()) != null) 
+			{   
+                String tokens[]  = Utils.tokenize(line);
+                String url = tokens[0];
+                Integer docId = new Integer(i);
+
+				for(int j = 0; j < tokens.length; ++j)
+				{
+                    LinkedList<Integer> temp;
+					if(!index.containsKey(tokens[j]))
+					{
+                        temp = new LinkedList<Integer>();
+                        temp.add(docId);
+                        index.put(tokens[j], temp);
+                        continue;
+                    }	
+                    
+                    temp = index.get(tokens[j]);
+					if(temp.size() > 0 && temp.get(temp.size() - 1) != docId.intValue())
+					{   
+                        temp.add(docId);
+                    }	
+                }
+                ++i;
             }
-            docCount++;
-            docIterator.remove();
+			br.close();	
         }
-      //System.out.println(index.get("economist").size()); 
+        
+		catch(Exception e)
+		{
+            e.printStackTrace();	
+		}
+    }
+
+    private String getUrl(int num)
+    {
+        try
+		{
+            File inp = new File(fileName);
+			BufferedReader br = new BufferedReader(new FileReader(inp));
+            String line = "";
+            
+			for(int i = 0; i <= num; ++i) 
+			{
+                line = br.readLine();
+            }
+            String tokens[]  = Utils.tokenize(line);
+            return tokens[0];
+        }
+
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return "[ERROR]";
+        }
+    }
+
+    public String Intersection(String lhs, String rhs)
+    {
+        try
+        {
+            lhs = Utils.tokenizeWord(lhs);
+            rhs = Utils.tokenizeWord(rhs);
+            
+            LinkedList<Integer> docIds = performIntersection(index.get(lhs), index.get(rhs));
+            
+            return docIds.toString();
+        }
+
+        catch(Exception e)
+        {
+            return "[Error] : " + e;
+        }
+    }
+
+    public String Intersection(String lhs, String rhs, int k)
+    {
+        try
+        {
+            lhs = Utils.tokenizeWord(lhs);
+            rhs = Utils.tokenizeWord(rhs);
+            
+            LinkedList<Integer> docIds = performIntersection(index.get(lhs), index.get(rhs));
+
+            k = k < docIds.size() ? k : docIds.size();
+
+            String result = "";
+            for(int i = 0; i < k; ++i)
+            {
+                result += (docIds.get(i) + " " + getUrl(docIds.get(i)) + "\n"); 
+            }
+            return result;
+        }
+
+        catch(Exception e)
+        {
+            return "[Error] : " + e;
+        }
+    }
+
+    private LinkedList<Integer> performIntersection(LinkedList<Integer> p, LinkedList<Integer> q)
+    {
+        int pIndex = 0;
+        int qIndex = 0;
+        LinkedList<Integer> result = new LinkedList<Integer>();
+
+        while(pIndex < p.size() && qIndex < q.size())
+        {
+            int pVal = p.get(pIndex);
+            int qVal = q.get(qIndex);
+
+            if(pVal == qVal)
+            {
+                result.add(p.get(pIndex));
+                ++pIndex;
+                ++qIndex;
+            }
+
+            else if(pVal < qVal)
+                ++pIndex;
+            else
+                ++qIndex;
+        }
+        return result;
     }
 }
