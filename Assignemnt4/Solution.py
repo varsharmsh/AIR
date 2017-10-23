@@ -40,7 +40,7 @@ def add_doc_to_index(content, doc_id):
     normalizing_factor = 0
     temp = 0
 
-    for word in unique_words.keys():
+    for word in unique_words:
         index[word][doc_freq] += 1
         temp += unique_words[word] ** 2
     
@@ -75,24 +75,31 @@ def generate_index(file_name):
 
 def find_similarity(words):
     score = {}
-    
+    unique_words = {}
+
     for word in words:
+        if word not in unique_words:
+            unique_words[word] = 0
+        unique_words[word] += 1
+
+    for word in unique_words:
         try:
             idf = math.log10(total_docs / index[word][doc_freq])
-            for doc_id in index[word][posting_list].keys():
+            for doc_id in index[word][posting_list]:
                 if doc_id not in score:
                     score[doc_id] = 0
                 ## check this part
                 tf = 1 + math.log10(index[word][posting_list][doc_id])
-                score[doc_id] +=  tf * idf
+                query_tf = 1 + math.log10(unique_words[word])
+                score[doc_id] +=  tf * idf * query_tf
         except:
             continue
     
-    for key in score.keys():
+    for key in score:
         score[key] = score[key] / normalizing_factors[key]
 
     score = sorted(score.items(), key = lambda e : e[1], reverse=True)
-    print(score[0: min(10, len(score))]) 
+    print([x[0] for x in score[0: min(10, len(score))]])
 
 def ask_query():
     """waits for input form user and finds 10 most relevant documents"""
